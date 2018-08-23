@@ -15,15 +15,14 @@ void Sha1::hashBlock()
   uint32_t d=state.w[3];
   uint32_t e=state.w[4];
   uint32_t t;
-  uint8_t i;
-  for (i=0; i<80; i++) 
+  for(uint8_t i=0; i<80; i++) 
 		{
-    if (i>=16) 
+    if(i>=16) 
 			{
 			t = buffer.w[(i+13)&15] ^ buffer.w[(i+8)&15] ^ buffer.w[(i+2)&15] ^ buffer.w[i&15];
 			buffer.w[i&15] = rol32(t,1);
 			}
-    if(i<20)
+		if(i<20)
       t = (d ^ (b & (c ^ d))) + SHA1_K0;
 		else if(i<40)
       t = (b ^ c ^ d) + SHA1_K20;
@@ -37,7 +36,7 @@ void Sha1::hashBlock()
     c=rol32(b,30);
     b=a;
     a=t;
-  }
+		}
   state.w[0] += a;
   state.w[1] += b;
   state.w[2] += c;

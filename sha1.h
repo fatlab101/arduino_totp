@@ -42,18 +42,18 @@ public:
 		buf_offset = 0;
 		memcpy_P(state.b,sha1InitState,HASH_LENGTH);
 		}
-	void init_hmac(const uint8_t* key,int keyLength)
+	void init_hmac(const uint8_t* key,int key_len)
 		{
 		memset(key_buf,0,BLOCK_LENGTH);
-		if(keyLength>BLOCK_LENGTH) // Hash long keys
+		if(key_len>BLOCK_LENGTH) // Hash long keys
 			{	
 			init();
-			for(;keyLength--;) 
+			for(;key_len--;) 
 				write(*key++);
 			memcpy(key_buf,end(),HASH_LENGTH);
 			} 
 		else	// Block length keys are used as is	
-			memcpy(key_buf,key,keyLength);
+			memcpy(key_buf,key,key_len);
 		// Start inner hash
 		init();
 		for(uint8_t i=0; i<BLOCK_LENGTH; i++)
@@ -65,17 +65,15 @@ public:
 		byte_count++;
 		add(b);
 		}
-	void write(const uint8_t *buffer, size_t size)
+	void write(const uint8_t *buffer,size_t len)
 		{
-		if(buffer==NULL)
-			return;
-		for(;size--;) 
+		if(buffer==NULL)return; //sanity check
+		for(;len--;) 
 			write(*buffer++);
 		}
-	void write(const char *str)
+	void write(const char *str) //MUST be string
 		{
-		if(str==NULL)
-			return;
+		if(str==NULL)return; //sanity check
 		while(*str) 
 			write(*str++);
 		}
@@ -102,8 +100,8 @@ public:
 		//Calculate outer hash
 		init();
 		uint8_t i;
-		for(i=0; i<BLOCK_LENGTH; i++) write(key_buf[i] ^ HMAC_OPAD);
-		for(i=0; i<HASH_LENGTH; i++)	write(inner_hash[i]);
+		for(i=0; i<BLOCK_LENGTH; i++)write(key_buf[i] ^ HMAC_OPAD);
+		for(i=0; i<HASH_LENGTH; i++)write(inner_hash[i]);
 		return end();
 		}
 private:
@@ -123,12 +121,15 @@ private:
 		// Implement SHA-1 padding (fips180-2 §5.1.1)
 		// Pad with 0x80 followed by 0x00 until the end of the block
 		add(0x80);
-		while(buf_offset!=56)
+		while(buf_offset!=(BLOCK_LENGTH-8))
 			add(0x00);
-		// Append length in the last 8 bytes
-		add(0);	// We're only using 32 bit lengths but SHA-1 supports 64 bit lengths
-		add(0);	// So zero pad the top bits
-		add(0);	// Shifting to multiply by 8 as SHA-1 supports bitstreams as well as bytes
+		// Append length in bits is the last 8 bytes
+		// We're only using 32 bit lengths but SHA-1 supports 64 bit lengths
+		// So zero pad the top bits 
+		//Shifting to multiply by 8 as SHA-1 supports bitstreams as well as bytes
+		add(0);	
+		add(0);	
+		add(0);
 		add(byte_count >> 29); 
 		add(byte_count >> 21); 
 		add(byte_count >> 13);
