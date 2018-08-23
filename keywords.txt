@@ -1,0 +1,16 @@
+#######################################
+# Syntax Coloring Map For TOTP
+####################################### 
+# Datatypes (KEYWORD1)
+#######################################
+
+TOTP	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+gen_code	KEYWORD2
+update_secret KEYWORD2
+have_secret KEYWORD2
+code_to_str KEYWORD2
