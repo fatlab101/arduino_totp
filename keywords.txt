@@ -12,5 +12,7 @@ TOTP	KEYWORD1
 
 gen_code	KEYWORD2
 update_secret KEYWORD2
+update_secret_from_eeprom KEYWORD2
+save_secret_to_eeprom KEYWORD2
 have_secret KEYWORD2
 code_to_str KEYWORD2

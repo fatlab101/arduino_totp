@@ -4,12 +4,13 @@
 #define _TOTP_H
 #include "Arduino.h"
 #include "sha1.h"
+#include <EEPROM.h>
 
 class TOTP 
 {
 private:
 	static const int c_def_step_secs=30; //default is 30 second steps
-	static const uint8_t c_max_secret_len=24;//Should be adequate max buffer - allow a ~30+ char expresssion
+	static const uint8_t c_max_secret_len=24;//Should be adequate max buffer - allow a ~30+ char secret
 	static const long c_bad_code =-1; 
 public:
 	TOTP(int step_secs=c_def_step_secs):m_time_step_secs(step_secs),m_secret_len(0){}
@@ -24,6 +25,30 @@ public:
 	bool update_secret(const char* key_str)
 		{
 		return key_str!=NULL && update_secret(reinterpret_cast<const uint8_t*>(key_str),strlen(key_str));
+		}
+	//save & load from eeprom at a specified index - the first byte contains the secret length
+	bool save_secret_to_eeprom(int idx)const
+		{
+		if(!have_secret())
+			return false; 
+		if(idx<0 || (idx+1+m_secret_len)>=EEPROM.length())
+			return false; //overshoot
+		EEPROM.write(idx,m_secret_len);
+		for(uint8_t i=0; i<m_secret_len; i++)
+			EEPROM.write(idx+1+i,m_secret[i]);
+		return true;
+		}
+	bool update_secret_from_eeprom(int idx,uint8_t c_max_len=c_max_secret_len)
+		{
+		const uint8_t len=EEPROM.read(idx);
+		if(len==0 || len>c_max_len)
+			return false;
+		if(idx<0 || (idx+1+len)>=EEPROM.length())
+			return false; //overshoot
+		m_secret_len=len;
+		for(uint8_t i=0; i<len; i++)
+			m_secret[i]=EEPROM.read(idx+1+i);
+		return true;
 		}
 	//Generate code
 	long gen_code(long timeStamp){return gen_code_steps(timeStamp/m_time_step_secs);}
