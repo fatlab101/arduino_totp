@@ -84,6 +84,7 @@ private:
 		for(int i=1; i<=sizeof(long); steps>>=8, i++)
 			challenge[8-i] = static_cast<uint8_t>(steps & 0XFF);
 		//get the HMAC-SHA1 hash from counter and key
+		Sha1 sha1;//TODO is global or stack better - takes up ~170 bytes
 		sha1.init_hmac(m_secret,m_secret_len);
 		sha1.write(challenge,8);
 		const uint8_t* _hash= sha1.end_hmac();

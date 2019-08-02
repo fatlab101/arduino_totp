@@ -1,6 +1,6 @@
 #include "sha1.h"
 
-Sha1 sha1; //global
+//Sha1 sha1; //global
 
 #define SHA1_K0 0x5a827999
 #define SHA1_K20 0x6ed9eba1
