@@ -3,7 +3,15 @@
 
 #include <inttypes.h>
 #include <string.h>
+
+#if defined(__AVR__)
 #include <avr/pgmspace.h>
+#define PROGMEM_IDENTIFIER PROGMEM
+#define PROG_MEM_COPY(dst,src,sz) memcpy_P((dst),(src),(sz));
+#else //Non Avr eg.ESP32
+#define PROGMEM_IDENTIFIER
+#define PROG_MEM_COPY(dst,src,sz) memcpy((dst),(src),(sz));
+#endif
 
 #define HASH_LENGTH 20
 #define BLOCK_LENGTH 64
@@ -22,7 +30,7 @@ union _state
 	uint32_t w[HASH_LENGTH/4];
 	};
 
-const uint8_t sha1InitState[] PROGMEM = 
+const uint8_t sha1InitState[] PROGMEM_IDENTIFIER =
 	{
 	0x01,0x23,0x45,0x67, // H0
 	0x89,0xab,0xcd,0xef, // H1
@@ -40,7 +48,7 @@ public:
 		{
 		byte_count = 0;
 		buf_offset = 0;
-		memcpy_P(state.b,sha1InitState,HASH_LENGTH);
+		PROG_MEM_COPY(state.b,sha1InitState,HASH_LENGTH);
 		}
 	void init_hmac(const uint8_t* key,int key_len)
 		{
@@ -144,8 +152,6 @@ private:
 	uint32_t byte_count;
 	uint8_t key_buf[BLOCK_LENGTH];
 	uint8_t inner_hash[HASH_LENGTH];
-    
 };
-//extern Sha1 sha1;
 
 #endif

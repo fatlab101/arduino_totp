@@ -4,15 +4,15 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-TOTP	KEYWORD1
+Totp	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
 gen_code	KEYWORD2
-update_secret KEYWORD2
+update_secret 	KEYWORD2
 update_secret_from_eeprom KEYWORD2
 save_secret_to_eeprom KEYWORD2
-have_secret KEYWORD2
-code_to_str KEYWORD2
+have_secret 	KEYWORD2
+code_to_str 	KEYWORD2
